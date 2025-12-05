@@ -37,26 +37,22 @@ int main() {
 
     char filename[MAX_LEN];
 
-    // получаем имя файла от родителя
     if (fgets(filename, MAX_LEN, stdin) == NULL) {
         fprintf(stderr, "Couldn't get the file name.\n");
         exit(1);
     }
     filename[strcspn(filename, "\n")] = '\0';
 
-    // накапливаем кореектные строки
     char *buffer = NULL;
     size_t total = 0;
     char line[MAX_LEN];
 
-    // считываем строки до пустой
     while (fgets(line, MAX_LEN, stdin)) {
         if (line[0] == '\n') break;
 
         if (first_letter(line)) {
             size_t len = strlen(line);
 
-            // увеличиваем буфер
             char *tmp = realloc(buffer, total + len + 1);
             if (!tmp) {
                 fprintf(stderr, "Memory allocation failed\n");
@@ -74,7 +70,6 @@ int main() {
         }
     }
 
-    // создаем файл нужного размера
     int fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, 0644);
     if (fd == -1) {
         printf("Cannot open file \"%s\": %s\n", filename, strerror(errno));
@@ -82,7 +77,6 @@ int main() {
         exit(1);
     }
 
-    // устанавливаем размер под накопленные строки
     if (ftruncate(fd, total + 1) == -1) {
         printf("Ftruncate failed: %s\n", strerror(errno));
         close(fd);
@@ -90,7 +84,6 @@ int main() {
         exit(1);
     }
 
-    // отображаем файл в память
     char *memory = mmap(NULL, total + 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
     if (memory == MAP_FAILED) {
@@ -100,13 +93,10 @@ int main() {
         exit(1);
     }
 
-    // записываем данные в память
     if (buffer) {
         memcpy(memory, buffer, total);
     }
     memory[total] = '\0';
-
-    // освобождаем ресурсы
 
     munmap(memory, total + 1);
     close(fd);
