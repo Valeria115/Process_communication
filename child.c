@@ -68,7 +68,7 @@ int main() {
     char line[MAX_LEN];
 
     while (fgets(line, MAX_LEN, stdin)) {
-        if (line[0] == "\n") break;
+        if (line[0] == '\n') break;
 
         if (!first_letter(line)) {
             printf("Error: string \'%s' does not start with a capital letter.\n", line);
